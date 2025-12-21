@@ -1,11 +1,16 @@
 import pandas as pd
+from .feature_engineering import preprocess_features
 
 
 def load_data(fraud_path, ip_path):
-    """Load the fraud and IP datasets."""
-    fraud_df = pd.read_csv(fraud_path)
-    ip_df = pd.read_csv(ip_path)
-    return fraud_df, ip_df
+    """Load the fraud and IP datasets with error handling."""
+    try:
+        fraud_df = pd.read_csv(fraud_path)
+        ip_df = pd.read_csv(ip_path)
+        return fraud_df, ip_df
+    except FileNotFoundError as e:
+        print(f"Error loading data: {e}")
+        raise
 
 
 def fix_data_types(fraud_df, ip_df):
@@ -24,25 +29,37 @@ def fix_data_types(fraud_df, ip_df):
 
 def merge_geolocation(fraud_df, ip_df):
     """Merge fraud data with IP-to-country mapping using merge_asof."""
-    # Sort for merge_asof
-    fraud_df = fraud_df.sort_values("ip_address")
-    ip_df = ip_df.sort_values("lower_bound_ip_address")
+    try:
+        # Check required columns
+        if "ip_address" not in fraud_df.columns:
+            raise KeyError("Fraud dataset missing required column: 'ip_address'")
+        if "lower_bound_ip_address" not in ip_df.columns:
+            raise KeyError(
+                "IP dataset missing required column: 'lower_bound_ip_address'"
+            )
 
-    # Perform merge
-    merged_df = pd.merge_asof(
-        fraud_df,
-        ip_df,
-        left_on="ip_address",
-        right_on="lower_bound_ip_address",
-        direction="backward",
-    )
+        # Sort for merge_asof
+        fraud_df = fraud_df.sort_values("ip_address")
+        ip_df = ip_df.sort_values("lower_bound_ip_address")
 
-    # Validate: ensure IP <= upper_bound
-    merged_df = merged_df[
-        merged_df["ip_address"] <= merged_df["upper_bound_ip_address"]
-    ]
+        # Perform merge
+        merged_df = pd.merge_asof(
+            fraud_df,
+            ip_df,
+            left_on="ip_address",
+            right_on="lower_bound_ip_address",
+            direction="backward",
+        )
 
-    return merged_df
+        # Validate: ensure IP <= upper_bound
+        merged_df = merged_df[
+            merged_df["ip_address"] <= merged_df["upper_bound_ip_address"]
+        ]
+
+        return merged_df
+    except KeyError as e:
+        print(f"Merge error: {e}")
+        raise
 
 
 def clean_data(merged_df):
@@ -56,20 +73,43 @@ def clean_data(merged_df):
     return merged_df
 
 
+def calculate_velocity_features(df):
+    """Calculate user-level velocity features."""
+    # Simple transaction velocity: Total transactions per user
+    df["user_tx_count"] = df.groupby("user_id")["user_id"].transform("count")
+
+    # Velocity: Transactions per device
+    df["device_tx_count"] = df.groupby("device_id")["device_id"].transform("count")
+    return df
+
+
 def add_features(merged_df):
-    """Add engineered features: time_since_signup, hour_of_day, day_of_week."""
+    """Add engineered features: time_since_signup, hour_of_day, day_of_week, velocity."""
     merged_df["time_since_signup"] = (
         merged_df["purchase_time"] - merged_df["signup_time"]
     ).dt.total_seconds()
     merged_df["hour_of_day"] = merged_df["purchase_time"].dt.hour
     merged_df["day_of_week"] = merged_df["purchase_time"].dt.dayofweek
+
+    # Add velocity features
+    merged_df = calculate_velocity_features(merged_df)
+
     return merged_df
 
 
-def preprocess_data(fraud_path, ip_path):
-    """Complete preprocessing pipeline."""
+def preprocess_data(fraud_path, ip_path, creditcard_path=None):
+    """Complete preprocessing pipeline, now including creditcard if provided."""
     fraud_df, ip_df = load_data(fraud_path, ip_path)
     fraud_df, ip_df = fix_data_types(fraud_df, ip_df)
     merged_df = merge_geolocation(fraud_df, ip_df)
     merged_df = clean_data(merged_df)
     merged_df = add_features(merged_df)
+
+    if creditcard_path:
+        creditcard_df = pd.read_csv(creditcard_path)
+        creditcard_df = creditcard_df.drop_duplicates()
+        merged_df, creditcard_df = preprocess_features(merged_df, creditcard_df)
+        return merged_df, creditcard_df
+    else:
+        # For fraud only, no need to call preprocess_features
+        return merged_df
