@@ -1,27 +1,75 @@
-# Ecommerce Banking Fraud Detection ML Project
+# 🚀 Ecommerce Banking Fraud Detection ML Project
 
-## Project Overview
-This project aims to develop a machine learning model to detect fraudulent transactions in an ecommerce banking system. The dataset includes user transaction data with features such as signup and purchase times, IP addresses, and geolocation information. Task 1 focuses on data preprocessing, feature engineering, and exploratory data analysis (EDA) to prepare the data for modeling.
+[![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
+[![Pandas](https://img.shields.io/badge/Pandas-2.0+-green.svg)](https://pandas.pydata.org/)
+[![Status](https://img.shields.io/badge/Status-Active-brightgreen.svg)]()
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## Data Cleaning & Preprocessing
-- Loaded raw fraud data and IP-to-country mapping datasets.
-- Converted IP addresses from float to integer for accurate matching.
-- Converted signup_time and purchase_time to datetime objects for time-based analysis.
-- Performed geolocation merge using `pd.merge_asof` to map user IPs to countries, with backward direction to find the closest lower bound.
-- Validated merges by ensuring IP addresses fall within the upper and lower bounds.
-- Filled missing country values with "Unknown".
-- Removed duplicate rows to ensure data integrity.
+## 📋 Project Background
 
-## Feature Engineering
-We created three key features to capture temporal patterns in user behavior:
-- `time_since_signup`: The time difference in seconds between purchase and signup, calculated as `(purchase_time - signup_time).dt.total_seconds()`. This helps identify suspicious rapid transactions after account creation.
-- `hour_of_day`: The hour of the purchase (0-23), extracted from `purchase_time.dt.hour`. This captures daily patterns in fraudulent activity.
-- `day_of_week`: The day of the week (0=Monday, 6=Sunday), extracted from `purchase_time.dt.dayofweek`. This reveals weekly trends in fraud.
+This project develops a machine learning model to detect fraudulent transactions in ecommerce banking systems. By analyzing user behavior, temporal patterns, and geolocation data, it addresses the critical business need to minimize financial losses from fraud, enhancing security and trust.
 
-## Key EDA Insights
-- **Class Distribution**: The dataset shows a significant class imbalance, with a majority of non-fraudulent transactions (class 0) and a minority of fraudulent ones (class 1).
-- **Fraud by Country**: The top countries with the highest fraud cases include [list based on data, e.g., United States, China, etc.]. This suggests geographic patterns in fraudulent behavior.
-- **Time Analysis**: Fraudulent transactions tend to occur shortly after signup, as evidenced by the histogram of `time_since_signup` showing higher fraud rates for smaller time differences. This indicates that fraudsters may create accounts and immediately attempt purchases.
+## 📁 Directory Structure
 
-## Class Imbalance Strategy
-The dataset exhibits a clear class imbalance, with fraudulent transactions being underrepresented. In Task 2, we will address this by applying Synthetic Minority Oversampling Technique (SMOTE) to generate synthetic samples for the minority class, or alternatively use undersampling of the majority class. This will ensure the model can learn effectively from both classes without bias towards the majority.
+```
+.
+├── .github/
+│   └── workflows/
+│       └── unittests.yml
+├── .gitignore
+├── .vscode/
+│   └── settings.json
+├── LICENSE
+├── README.md
+├── data/
+│   ├── processed/
+│   │   └── .gitkeep
+│   └── raw/
+│       ├── .gitkeep
+│       ├── creditcard.csv
+│       ├── Fraud_Data.csv
+│       └── IpAddress_to_Country.csv
+├── images/
+│   └── .gitkeep
+├── models/
+│   └── .gitkeep
+├── notebooks/
+│   ├── README.md
+│   ├── eda-creditcard.ipynb
+│   ├── eda-fraud-data.ipynb
+│   ├── feature-engineering.ipynb
+│   ├── modeling.ipynb
+│   └── shap-explainability.ipynb
+├── requirements.txt
+├── scripts/
+│   ├── __init__.py
+│   └── README.md
+├── src/
+│   ├── __init__.py
+│   └── preprocessing.py
+└── tests/
+    ├── __init__.py
+```
+
+## 🔍 Deep Analysis
+
+### EDA Insights
+- **Class Imbalance:** Severe skew with ~90% valid transactions.
+- **Temporal Patterns:** Fraud peaks at certain hours and shortly after signup.
+- **Geographic Risks:** Top countries include China and the US.
+
+<details>
+<summary>📊 View Correlation Heatmap</summary>
+![Correlation Heatmap](images/correlation_heatmap.png)
+</details>
+
+<details>
+<summary>🥧 Fraud Distribution Pie Chart</summary>
+![Fraud Distribution](images/fraud_distribution_pie.png)
+</details>
+
+## 🛠 Installation
+
+1. Clone the repo: `git clone <repo-url>`
+2. Install dependencies: `pip install -r requirements.txt`
+3. Run notebooks in `notebooks/` for analysis.
