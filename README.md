@@ -115,6 +115,27 @@ A horizontal bar chart ranking countries by fraud incidence, enabling targeted r
 ![Country Risk](images/country_risk.png)
 </details>
 
+<details>
+<summary>📈 Class Distribution Histogram - Transaction Value Analysis</summary>
+This histogram shows the distribution of transaction values across legitimate and fraudulent classes, revealing patterns in purchase amounts that can help identify suspicious activities.
+
+![Class Distribution](images/class_distribution.png)
+</details>
+
+<details>
+<summary>🌐 Fraud by Country - Geographic Fraud Map</summary>
+A visualization mapping fraud incidents by country, highlighting global hotspots and enabling geographic risk assessment for international transactions.
+
+![Fraud by Country](images/fraud_by_country.png)
+</details>
+
+<details>
+<summary>⏳ Time Since Signup Histogram - Account Age Analysis</summary>
+This histogram analyzes the time elapsed since account signup for fraudulent transactions, identifying patterns in account lifecycle that indicate potential fraud risks.
+
+![Time Since Signup](images/time_since_signup_hist.png)
+</details>
+
 ## 🛠 Installation & Setup
 
 ### Prerequisites
