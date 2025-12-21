@@ -1,4 +1,5 @@
 import pandas as pd
+from .feature_engineering import preprocess_features
 
 
 def load_data(fraud_path, ip_path):
@@ -66,10 +67,19 @@ def add_features(merged_df):
     return merged_df
 
 
-def preprocess_data(fraud_path, ip_path):
-    """Complete preprocessing pipeline."""
+def preprocess_data(fraud_path, ip_path, creditcard_path=None):
+    """Complete preprocessing pipeline, now including creditcard if provided."""
     fraud_df, ip_df = load_data(fraud_path, ip_path)
     fraud_df, ip_df = fix_data_types(fraud_df, ip_df)
     merged_df = merge_geolocation(fraud_df, ip_df)
     merged_df = clean_data(merged_df)
     merged_df = add_features(merged_df)
+
+    if creditcard_path:
+        creditcard_df = pd.read_csv(creditcard_path)
+        creditcard_df = creditcard_df.drop_duplicates()
+        merged_df, creditcard_df = preprocess_features(merged_df, creditcard_df)
+        return merged_df, creditcard_df
+    else:
+        merged_df = preprocess_features(merged_df, pd.DataFrame())[0]  # For fraud only
+        return merged_df

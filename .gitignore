@@ -1,0 +1,9 @@
+data/
+*.csv
+*.pkl
+*.ds_store
+.vscode/
+__pycache__/
+data/raw/*.csv
+data/processed/*.csv
+.venv/
