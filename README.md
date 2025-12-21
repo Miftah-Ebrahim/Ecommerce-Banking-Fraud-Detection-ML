@@ -225,9 +225,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- Dataset providers for enabling research
-- Open-source community for powerful tools
-- Contributors and reviewers for valuable feedback
+- Kifiya Financial Technology
+- 10 Academy 12 week AI Mastery Program
 
 ---
 
