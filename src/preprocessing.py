@@ -81,5 +81,5 @@ def preprocess_data(fraud_path, ip_path, creditcard_path=None):
         merged_df, creditcard_df = preprocess_features(merged_df, creditcard_df)
         return merged_df, creditcard_df
     else:
-        merged_df = preprocess_features(merged_df, pd.DataFrame())[0]  # For fraud only
+        # For fraud only, no need to call preprocess_features
         return merged_df

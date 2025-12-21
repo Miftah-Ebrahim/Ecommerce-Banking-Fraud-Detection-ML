@@ -28,7 +28,8 @@ def preprocess_features(fraud_df, creditcard_df):
     fraud_df = encode_categorical(fraud_df)
     fraud_df = scale_features(fraud_df, ["purchase_value", "time_since_signup", "age"])
 
-    # Scale Creditcard_Data
-    creditcard_df = scale_features(creditcard_df, ["Amount"])
+    # Scale Creditcard_Data if provided
+    if not creditcard_df.empty:
+        creditcard_df = scale_features(creditcard_df, ["Amount"])
 
     return fraud_df, creditcard_df
